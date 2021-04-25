@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AddTask from "./components/AddTask";
 
 import Header from "./components/Header";
@@ -6,41 +6,45 @@ import Tasks from "./components/Tasks";
 
 function App() {
   const [showAddTask, setShowAddTask] = useState(false);
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      text: "Doctors appointment",
-      day: "Feb 5th at 2:30PM",
-      reminder: true,
-    },
-    {
-      id: 2,
-      text: "Meeting at school",
-      day: "Feb 6th at 1:30PM",
-      reminder: true,
-    },
-    {
-      id: 3,
-      text: "Food shopping",
-      day: "Feb 7th at 2:30PM",
-      reminder: false,
-    },
-    {
-      id: 4,
-      text: "Assignment deadline",
-      day: "Feb 7th at 10:30AM",
-      reminder: false,
-    },
-  ]);
+  const [tasks, setTasks] = useState([]);
 
-  const addTask = (task) => {
-    const id = Math.floor(Math.random() * 10000) + 1;
-    const newTask = { id, ...task };
-    setTasks([...tasks, newTask]);
+  useEffect(() => {
+    const getTasks = async () => {
+      const tasksFromServer = await fetchTasks();
+      setTasks(tasksFromServer);
+    };
+
+    getTasks();
+  }, []);
+
+  const fetchTasks = async () => {
+    const res = await fetch("http://localhost:5000/tasks");
+    const data = await res.json();
+    return data;
   };
 
-  const deleteTask = (id) => {
-    setTasks(tasks.filter((task) => task.id != id));
+  const addTask = async (task) => {
+    // const id = Math.floor(Math.random() * 10000) + 1;
+    // const newTask = { id, ...task };
+
+    const res = await fetch("http://localhost:5000/tasks", {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(task),
+    });
+
+    const data = await res.json();
+
+    setTasks([...tasks, data]);
+  };
+
+  const deleteTask = async (id) => {
+    await fetch(`http://localhost:5000/tasks/${id}`, {
+      method: "DELETE",
+    });
+    setTasks(tasks.filter((task) => task.id !== id));
   };
 
   const toggleReminder = (id) => {
