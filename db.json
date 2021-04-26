@@ -23,12 +23,6 @@
       "text": "Doctors appointment",
       "day": "Feb 7th at 3:30PM",
       "reminder": true
-    },
-    {
-      "id": 112,
-      "text": "Presentation",
-      "day": "Tomorrow @ 1:30PM",
-      "reminder": true
     }
   ]
 }
